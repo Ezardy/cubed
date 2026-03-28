@@ -12,18 +12,19 @@
 
 #include <fcntl.h>
 #include <string.h>
-#include <Tk/X11/X.h>
-#include "minilibx/mlx.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include "game/hooks.h"
+#include "parsing/parsing.h"
+#include "common/common.h"
+#include "mlx.h"
 #include "error/error.h"
 #include "error/codes.h"
 #include "game/game.h"
 #include "c3d_math/c3d_math.h"
 #include "game/config.h"
-#include <stdlib.h>
-#include "parsing/parsing.h"
-#include "common/common.h"
-#include <stdio.h>
-#include <unistd.h>
 
 void		free_game(t_render *r, t_mat *map, t_mat *states);
 
@@ -33,7 +34,7 @@ static void	free_minimap(t_render *r);
 int	main(int argc, char **argv)
 {
 	static t_cub	cub = {0};
-	static t_game	game = {.e = {0}, .r = {0}, .states = {0}, .door_hit = {0}};
+	static t_game	game = {0};
 
 	game.r.mlx = mlx_init();
 	if (track(&game.e, "main") && check_err(&game.e, argc == 2, \
@@ -66,15 +67,14 @@ static void	start_game(t_game *game, t_cub *cub, int tmp)
 		if (cub->map)
 			free_arr(cub->map);
 		if (free_return(cub->col_sides.north) && free_return(\
-		cub->col_sides.south) && free_return(cub->col_sides.east) \
-		&& free_return(cub->col_sides.west))
-			;
+		cub->col_sides.south) && free_return(cub->col_sides.east))
+			free_return(cub->col_sides.west);
 		mlx_do_key_autorepeaton(game->r.mlx);
-		mlx_hook(game->r.win, KeyPress, 0, key_hook, game);
+		mlx_hook(game->r.win, KeyPress, KeyPressMask, key_hook, game);
 		mlx_hook(game->r.win, DestroyNotify, 0, exit_game, game);
 		mlx_loop_hook(game->r.mlx, loop_hook, game);
-		mlx_mouse_move(game->r.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);
-		mlx_mouse_hide();
+		mlx_mouse_move(game->r.mlx, game->r.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);
+		mlx_mouse_hide(game->r.mlx, game->r.win);
 		render(game);
 		draw_minimap(game);
 		mlx_loop(game->r.mlx);

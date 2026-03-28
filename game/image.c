@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include "minilibx/mlx.h"
+#include "mlx.h"
 #include "t_render.h"
 #include "t_texture.h"
 #include "error/error.h"

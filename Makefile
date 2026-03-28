@@ -1,10 +1,23 @@
 NAME = cub3D
 BUILD_DIR = build
-mlx_dir = minilibx
+
+uname = $(shell uname)
+iflags = -I. -I/usr/include
+ifeq ($(uname), Darwin)
+	iflags += -Iminilibx
+	mlx_dir = minilibx
+	target_cflags = -framework OpenGL -framework AppKit
+else ifeq ($(uname), Linux)
+	iflags += -Iminilibx-linux
+	mlx_dir = minilibx-linux
+	target_cflags = -lXext -lX11 -lm -lz
+else
+	$(error Unsupported OS)
+endif
+
 libft_dir = libft
 lflags = -L$(libft_dir) -L$(mlx_dir)
-iflags = -I. -I/usr/include
-cflags = -Wall -Wextra -Werror
+cflags = -Wall -Wextra -Werror -std=gnu11
 
 all : make_dirs $(NAME)
 
@@ -86,7 +99,7 @@ obj += $(BUILD_DIR)/cub3D.o
 depflags = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.d
 
 $(NAME): $(mlx_dir)/libmlx.a $(libft_dir)/libft.a $(obj)
-	cc $(lflags) $(cflags) -o $@ $(obj) -lmlx -lft -framework OpenGL -framework AppKit
+	cc $(lflags) $(cflags) -o $@ $(obj) -lmlx -lft $(target_cflags)
 
 $(BUILD_DIR)/%.o: %.c $(BUILD_DIR)/%.d Makefile
 	cc $(cflags) $(iflags) $(depflags) -c $< -o $@
@@ -119,4 +132,4 @@ $(obj:.o=.d):
 include $(obj:.o=.d)
 
 test: Makefile texture_resizing_test.c
-	cc $(cflags) texture_resizing_test.c -o $@ $(lflags) -lmlx -framework OpenGL -framework AppKit
+	cc $(cflags) texture_resizing_test.c -o $@ $(lflags) -lmlx $(target_cflags)

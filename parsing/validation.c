@@ -101,8 +101,6 @@ int	validation(char *filename, t_cub *cubed, t_err *err)
 	int		ans;
 	int		count;
 	int		l_count;
-	char	*line;
-	char	*new_line;
 
 	ans = 0;
 	count = 0;
@@ -111,8 +109,6 @@ int	validation(char *filename, t_cub *cubed, t_err *err)
 	if (track(err, "validation") && \
 		check_err(err, check_file(&cubed->fd) == 0, PARSING_FILE_NOT_OPEN))
 	{
-		line = NULL;
-		new_line = NULL;
 		set_cubed(cubed, filename);
 		ans = valid_check(cubed, err, l_count, &count);
 		untrack(err);

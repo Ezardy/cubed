@@ -29,8 +29,6 @@ void	rotate(t_game *game, double cos_v, double sin_v)
 	x = game->cam.x;
 	game->cam.x = cos_v * x - sin_v * game->cam.y;
 	game->cam.y = sin_v * x + cos_v * game->cam.y;
-	render(game);
-	draw_minimap(game);
 }
 
 void	move(t_game *game, double mdx, double mdy)
@@ -51,6 +49,4 @@ void	move(t_game *game, double mdx, double mdy)
 			dir.y = 0;
 	}
 	vec_add(&game->ppos, &dir, &game->ppos);
-	render(game);
-	draw_minimap(game);
 }

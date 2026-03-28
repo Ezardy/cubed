@@ -18,7 +18,7 @@
 #include "parsing/t_cub.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include "minilibx/mlx.h"
+#include "mlx.h"
 
 int	set_imgs(t_game *game)
 {
@@ -100,9 +100,7 @@ void	draw_minimap(t_game *game)
 {
 	int		i;
 	int		j;
-	int		y;
 
-	y = game->map->h - 1 - (int)game->ppos.y;
 	i = -4;
 	while (++i < 5)
 	{

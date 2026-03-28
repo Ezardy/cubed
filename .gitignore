@@ -1,0 +1,8 @@
+cub3D
+.vscode/
+build/
+libft/libft.a
+*.o
+*.a
+*.gen
+minilibx-linux/test/mlx-test

@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stddef.h>
+
 #include "c3d_math/t_mat.h"
-#include <sys/_types/_size_t.h>
 #include "parsing/t_cub.h"
 
 int	is_surrounded(t_mat *map, size_t i, size_t j);

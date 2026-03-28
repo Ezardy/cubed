@@ -89,7 +89,7 @@ int	check_colors(char *line, char **s, t_cub *args)
 
 	ans = 1;
 	j = 0;
-	if (line + 1 != NULL)
+	if (line != NULL)
 	{
 		split_rgb = ft_split(line + 1, ',');
 		if (split_rgb && char_count(line, ",") == 2)

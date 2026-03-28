@@ -22,6 +22,7 @@
 typedef struct s_game
 {
 	bool		p_on;
+	bool		moved;
 	t_vec		ppos;
 	t_vec		prot;
 	t_vec		cam;

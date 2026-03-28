@@ -15,6 +15,9 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 50ul
 # endif
+# ifndef OPEN_MAX
+#  define OPEN_MAX 5000
+# endif
 # include <sys/types.h>
 
 size_t	ft_strjoin(char **s1, size_t res_len, char *s2, size_t len);

@@ -17,7 +17,7 @@
 #include "c3d_math/c3d_math.h"
 #include "c3d_math/t_ivec.h"
 #include "game/config.h"
-#include "minilibx/mlx.h"
+#include "mlx.h"
 #include "raycast/raycast.h"
 #include "t_game.h"
 
