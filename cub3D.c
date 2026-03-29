@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   cub3D.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zanikin <zanikin@student.42yerevan.am>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/10 20:30:01 by mamazari          #+#    #+#             */
-/*   Updated: 2024/10/21 19:31:01 by zanikin          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
@@ -69,8 +57,9 @@ static void	start_game(t_game *game, t_cub *cub, int tmp)
 		if (free_return(cub->col_sides.north) && free_return(\
 		cub->col_sides.south) && free_return(cub->col_sides.east))
 			free_return(cub->col_sides.west);
-		mlx_do_key_autorepeaton(game->r.mlx);
-		mlx_hook(game->r.win, KeyPress, KeyPressMask, key_hook, game);
+		mlx_do_key_autorepeatoff(game->r.mlx);
+		mlx_hook(game->r.win, KeyPress, KeyPressMask, key_hook_press, game);
+		mlx_hook(game->r.win, KeyRelease, KeyReleaseMask, key_hook_release, game);
 		mlx_hook(game->r.win, DestroyNotify, 0, exit_game, game);
 		mlx_loop_hook(game->r.mlx, loop_hook, game);
 		mlx_mouse_move(game->r.mlx, game->r.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);

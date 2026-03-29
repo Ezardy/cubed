@@ -1,18 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   hooks.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zanikin <zanikin@student.42yerevan.am>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/04 15:23:15 by zanikin           #+#    #+#             */
-/*   Updated: 2024/10/13 21:37:28 by zanikin          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "hooks.h"
 #include "game/game.h"
@@ -30,17 +19,28 @@ void		move(t_game *game, double mdx, double mdy);
 
 static void	switch_pointer(t_game *game);
 static bool	mouse_look(t_game *game);
+static long	get_time();
 void		door_handle(t_game *game);
 
 int	loop_hook(t_game *game)
 {
+	const int	frame_time = 1000000 / FPS_LIMIT;
+	const int	door_frame_time = 1000 * DOOR_ANIM_TIME_MS / frame_time / DOOR_FRAMES_COUNT + 1;
+
+	static long		last = 0;
+	long	elapsed = get_time() - last;
+	if (elapsed < frame_time)
+		usleep(frame_time - elapsed);
+	long time = get_time();
+	game->deltaTime = time - last;
+	last = time;
 	bool	need_update = mouse_look(game);
 	if (game->door_hit.type == 'D' && \
 	game->states.m[game->door_hit.idx.y][game->door_hit.idx.x] != 9 && \
 	game->states.m[game->door_hit.idx.y][game->door_hit.idx.x] != 0)
 	{
 		game->timer++;
-		if (game->timer % 200 == 0)
+		if (game->timer % door_frame_time == 0)
 		{
 			game->states.m[game->door_hit.idx.y][game->door_hit.idx.x]++;
 			need_update = true;
@@ -50,18 +50,45 @@ int	loop_hook(t_game *game)
 	game->states.m[game->door_hit.idx.y][game->door_hit.idx.x] != 0)
 	{
 		game->timer--;
-		if (game->timer % 200 == 0)
+		if (game->timer % door_frame_time == 0)
 		{
 			game->states.m[game->door_hit.idx.y][game->door_hit.idx.x]--;
 			need_update = true;
 		}
 	}
-	if (need_update || game->moved) {
+	char	hor = game->inputs.right - game->inputs.left;
+	char	ver = game->inputs.forward - game->inputs.backward;
+	need_update |= hor || ver;
+	if (ver) {
+		if (hor) {
+			if (hor > 0) {
+				if (ver > 0)
+					move(game, (game->prot.x + game->prot.y) * DIAGONAL_COS, (game->prot.y - game->prot.x) * DIAGONAL_COS);
+				else
+					move(game, (game->prot.y - game->prot.x) * DIAGONAL_COS, -(game->prot.x + game->prot.y) * DIAGONAL_COS);
+			} else if (ver > 0)
+				move(game, (game->prot.x - game->prot.y) * DIAGONAL_COS, (game->prot.x + game->prot.y) * DIAGONAL_COS);
+			else
+				move(game, -(game->prot.x + game->prot.y) * DIAGONAL_COS, (game->prot.x - game->prot.y) * DIAGONAL_COS);
+		} else if (ver > 0)
+			move(game, game->prot.x, game->prot.y);
+		else
+			move(game, -game->prot.x, -game->prot.y);
+	} else if (hor > 0)
+		move(game, game->prot.y, -game->prot.x);
+	else if (hor < 0)
+		move(game, -game->prot.y, game->prot.x);
+	if (need_update) {
 		render(game);
 		draw_minimap(game);
-		game->moved = false;
 	}
 	return (0);
+}
+
+static long	get_time() {
+	struct timeval	tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000000 + tv.tv_usec);
 }
 
 static bool	mouse_look(t_game *game)
@@ -77,37 +104,78 @@ static bool	mouse_look(t_game *game)
 		x -= WIN_WIDTH / 2;
 		if (x)
 		{
+			double	shift = x * MOUSE_SENSIVITY * game->deltaTime / 1000000;
+			if (shift > 0 && shift > MAX_ANGLE_SHIFT)
+				shift = MAX_ANGLE_SHIFT;
+			else if (shift < 0 && shift < -MAX_ANGLE_SHIFT)
+				shift = -MAX_ANGLE_SHIFT;
 			camera_updated = true;
-			rotate(game, cos(x * MOUSE_SENSIVITY), -sin(x * MOUSE_SENSIVITY));
+			rotate(game, cos(shift), -sin(shift));
 			mlx_mouse_move(game->r.mlx, game->r.win, WIN_WIDTH / 2, WIN_HEIGHT / 2);
 		}
 	}
 	return (camera_updated);
 }
 
-int	key_hook(int keycode, t_game *game)
+int	key_hook_press(int keycode, t_game *game)
 {
-	game->moved = true;
-	if (keycode == ESCAPE)
-		exit_game(game);
-	else if (keycode == LEFT_ARROW)
-		rotate(game, ROTATION_RESOLUTION_COS, ROTATION_RESOLUTION_SIN);
-	else if (keycode == RIGHT_ARROW)
-		rotate(game, ROTATION_RESOLUTION_COS, -ROTATION_RESOLUTION_SIN);
-	else if (keycode == ANSI_W)
-		move(game, game->prot.x, game->prot.y);
-	else if (keycode == ANSI_S)
-		move(game, -game->prot.x, -game->prot.y);
-	else if (keycode == ANSI_A)
-		move(game, -game->prot.y, game->prot.x);
-	else if (keycode == ANSI_D)
-		move(game, game->prot.y, -game->prot.x);
-	else {
-		game->moved = false;
-		if (keycode == ANSI_P)
+	switch (keycode) {
+		case ESCAPE:
+			exit_game(game);
+			break;
+		case LEFT_ARROW:
+			rotate(game, ROTATION_RESOLUTION_COS, ROTATION_RESOLUTION_SIN);
+			break;
+		case RIGHT_ARROW:
+			rotate(game, ROTATION_RESOLUTION_COS, -ROTATION_RESOLUTION_SIN);
+			break;
+		case ANSI_W:
+			game->inputs.forward = true;
+			break;
+		case ANSI_S:
+			game->inputs.backward = true;
+			break;
+		case ANSI_A:
+			game->inputs.left = true;
+			break;
+		case ANSI_D:
+			game->inputs.right = true;
+			break;
+		case ANSI_P:
 			switch_pointer(game);
-		else if (keycode == ANSI_E)
+			break;
+		case ANSI_E:
 			door_handle(game);
+			break;
+		default:
+			break;
+	}
+	return (0);
+}
+
+int	key_hook_release(int keycode, t_game *game)
+{
+	switch (keycode) {
+		case LEFT_ARROW:
+			game->inputs.rotate_left = false;
+			break;
+		case RIGHT_ARROW:
+			game->inputs.rotate_right = false;
+			break;
+		case ANSI_W:
+			game->inputs.forward = false;
+			break;
+		case ANSI_S:
+			game->inputs.backward = false;
+			break;
+		case ANSI_A:
+			game->inputs.left = false;
+			break;
+		case ANSI_D:
+			game->inputs.right = false;
+			break;
+		default:
+			break;
 	}
 	return (0);
 }

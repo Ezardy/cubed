@@ -1,24 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   config.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zanikin <zanikin@student.42yerevan.am>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/04 15:53:31 by zanikin           #+#    #+#             */
-/*   Updated: 2024/10/21 18:43:01 by zanikin          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CONFIG_H
 # define CONFIG_H
 
 # define WIN_WIDTH 1920
 # define WIN_HEIGHT 1080
+# define FPS_LIMIT 24
 # define ROTATION_RESOLUTION_COS 0.999847695
 # define ROTATION_RESOLUTION_SIN 0.017452406
-# define MOVEMENT_RESOLUTION 0.1
-# define MOUSE_SENSIVITY 0.03
+# define DIAGONAL_COS 0.707106781187
+# define VELOCITY 2.0
+# define MOUSE_SENSIVITY 0.01
+# define MAX_ANGLE_SHIFT 0.05
+# define DOOR_ANIM_TIME_MS 500
 # define CAMERA_HALF_FOV_TAN 0.5
 # define NEAR_CLIP_DIST 0.001
 # define DOOR_FRAMES_COUNT 10

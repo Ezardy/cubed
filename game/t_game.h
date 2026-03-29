@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   t_game.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mamazari <mamazari@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/21 01:33:15 by zanikin           #+#    #+#             */
-/*   Updated: 2024/10/13 20:55:10 by mamazari         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef T_GAME_H
 # define T_GAME_H
 
@@ -18,15 +6,17 @@
 # include "error/t_err.h"
 # include "raycast/t_rayhit.h"
 # include "t_render.h"
+# include "t_input.h"
 
 typedef struct s_game
 {
 	bool		p_on;
-	bool		moved;
+	t_input		inputs;
 	t_vec		ppos;
 	t_vec		prot;
 	t_vec		cam;
 	long		timer;
+	long		deltaTime;
 	t_rayhit	door_hit;
 	t_mat		*map;
 	t_mat		states;

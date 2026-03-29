@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   movement.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zanikin <zanikin@student.42yerevan.am>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/13 15:04:21 by zanikin           #+#    #+#             */
-/*   Updated: 2024/10/21 18:43:40 by zanikin          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <math.h>
 
 #include "t_game.h"
@@ -40,7 +28,7 @@ void	move(t_game *game, double mdx, double mdy)
 	set_vec(&dir, mdx, mdy);
 	raycast(game, &game->ppos, &dir, &hit);
 	set_vec(&dist, hit.pos.x - game->ppos.x, hit.pos.y - game->ppos.y);
-	vec_mul(&dir, MOVEMENT_RESOLUTION, &dir);
+	vec_mul(&dir, VELOCITY * game->deltaTime / 1000000, &dir);
 	if (!(hit.type == 'D' && game->states.m[hit.idx.y][hit.idx.x] == 9))
 	{
 		if (fabs(dist.x) < fabs(dir.x) + WALL_OFFSET)
